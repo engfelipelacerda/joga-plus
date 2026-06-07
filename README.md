@@ -16,7 +16,7 @@ Before running the project, make sure you have installed:
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/engfelipelacerda/joga-plus.git>
 cd joga-plus/backend
 ```
 
@@ -82,10 +82,10 @@ Request body:
 
 ```json
 {
-  "username": "luis",
-  "email": "luis@email.com",
-  "birth_date": "2003-08-15",
-  "password": "123456"
+  "username": "player1",
+  "email": "player1@example.com",
+  "birth_date": "2000-01-01",
+  "password": "password123"
 }
 ```
 
@@ -97,9 +97,9 @@ Request body:
 
 ```json
 {
-  "username": "luispessoa",
-  "email": "luispessoa@email.com",
-  "birth_date": "2003-08-15",
+  "username": "player2",
+  "email": "player2@example.com",
+  "birth_date": "2000-01-01",
   "password": "newpassword123"
 }
 ```
