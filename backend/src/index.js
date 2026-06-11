@@ -8,15 +8,17 @@ const port = 3333;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import userRoute from "./routes/userRoute.js";
-
 import connection from "./database/connection.js";
 import tables from "./database/tables.js";
+
+import userRouter from "./routes/userRoute.js";
+import loginRouter from "./routes/loginRoute.js";
 
 tables.init(connection);
 
 // todas as rotas dentro de sourceRoute vão começar em /
-app.use("/", userRoute);
+app.use("/users", userRouter);
+app.use("/auth", loginRouter);
 
 app.listen(port, (error) => {
   if (error) {

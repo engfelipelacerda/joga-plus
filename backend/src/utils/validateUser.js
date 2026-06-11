@@ -1,4 +1,4 @@
-function validateUser(user) {
+function validateUser(user, isUpdate = false) {
   if (!user.username) {
     return {
       error: true,
@@ -20,7 +20,7 @@ function validateUser(user) {
     };
   }
 
-  if (!user.password) {
+  if (!isUpdate && !user.password) {
     return {
       error: true,
       message: "password é obrigatório",

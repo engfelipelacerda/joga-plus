@@ -14,8 +14,10 @@ class userController {
   }
 
   async update(id, user) {
-    const passwordHash = await bcrypt.hash(user.password, 10);
-    user.password = passwordHash;
+    if (user.password) {
+      user.password = await bcrypt.hash(user.password, 10);
+    }
+
     return await userModel.update(id, user);
   }
 

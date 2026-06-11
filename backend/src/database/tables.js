@@ -19,8 +19,8 @@ class Tables {
       await this.connection.query(sql);
       console.log("Tabela users verificada com sucesso");
     } catch (error) {
-      console.log("Deu erro na hora de criar a tabela users");
-      console.log(error.message);
+      console.error("Deu erro na hora de criar a tabela users");
+      console.error(error.message);
     }
   }
 }

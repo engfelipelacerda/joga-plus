@@ -2,14 +2,14 @@ import connection from "../database/connection.js";
 
 class userModel {
   async list() {
-    const sql = "SELECT * FROM users";
+    const sql = "SELECT id, username, email, birth_date, created_at FROM users";
 
     try {
       const [response] = await connection.query(sql);
-      console.log("funcionou o listar!");
+      console.info("Usuários listados com sucesso.");
       return response;
     } catch (error) {
-      console.log("Deu erro no listar!");
+      console.error("Erro ao listar usuários:", error);
       throw error;
     }
   }
@@ -30,39 +30,55 @@ class userModel {
       ];
 
       const [response] = await connection.query(sql, values);
-      console.log("Funcionou o create!");
+      console.info("Usuário criado com sucesso.");
       return response;
     } catch (error) {
-      console.log("Deu erro no create!");
+      console.error("Erro ao criar usuário:", error);
       throw error;
     }
   }
 
   async update(id, user) {
-    const sql = `
-    UPDATE users
-      SET
-        username = ?,
-        email = ?,
-        birth_date = ?,
-        password = ?
-      WHERE id = ?;
-    `;
-    const values = [
-      user.username,
-      user.email,
-      user.birth_date,
-      user.password,
-      id,
-    ];
     try {
-      const [response] = await connection.query(sql, values);
+      let sql;
+      let values;
 
-      console.log("Funcionou o update!");
+      if (user.password) {
+        sql = `
+        UPDATE users
+        SET
+          username = ?,
+          email = ?,
+          birth_date = ?,
+          password = ?
+        WHERE id = ?;
+      `;
+
+        values = [
+          user.username,
+          user.email,
+          user.birth_date,
+          user.password,
+          id,
+        ];
+      } else {
+        sql = `
+        UPDATE users
+        SET
+          username = ?,
+          email = ?,
+          birth_date = ?
+        WHERE id = ?;
+      `;
+
+        values = [user.username, user.email, user.birth_date, id];
+      }
+
+      const [response] = await connection.query(sql, values);
 
       return response;
     } catch (error) {
-      console.log("Deu erro no update!");
+      console.error("Erro ao atualizar usuário:", error);
       throw error;
     }
   }
@@ -75,13 +91,10 @@ class userModel {
 
     try {
       const [response] = await connection.query(sql, [id]);
-
-      console.log("Funcionou o delete!");
-
+      console.info("Usuário removido com sucesso.");
       return response;
     } catch (error) {
-      console.log("Deu erro no delete!");
-
+      console.error("Erro ao remover usuário:", error);
       throw error;
     }
   }

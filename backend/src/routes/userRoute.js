@@ -5,22 +5,22 @@ import validateUser from "../utils/validateUser.js";
 
 // get, post, put, delete
 // quando alguém acessar tal URL execute essa função.
-userRouter.get("/users", async (req, res) => {
+userRouter.get("/", async (req, res) => {
   try {
     const listUsers = await userController.list();
 
     return res.status(200).json(listUsers);
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return res.status(500).json({
       error: true,
-      message: error.message,
+      message: "Erro ao listar usuários.",
     });
   }
 });
 
-userRouter.post("/users", async (req, res) => {
+userRouter.post("/", async (req, res) => {
   try {
     const user = req.body;
 
@@ -33,21 +33,21 @@ userRouter.post("/users", async (req, res) => {
     const response = await userController.create(user);
     return res.status(201).json(response);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return res.status(500).json({
       error: true,
-      message: error.message,
+      message: "Erro ao cadastrar usuário.",
     });
   }
 });
 
-userRouter.put("/users/:id", async (req, res) => {
+userRouter.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.body;
 
     // validate before saving the new client
-    const validation = validateUser(user);
+    const validation = validateUser(user, true);
     if (validation) {
       return res.status(400).json(validation);
     }
@@ -55,26 +55,26 @@ userRouter.put("/users/:id", async (req, res) => {
     const response = await userController.update(id, user);
     return res.status(200).json(response);
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return res.status(500).json({
       error: true,
-      message: error.message,
+      message: "Erro ao atualizar usuário.",
     });
   }
 });
 
-userRouter.delete("/users/:id", async (req, res) => {
+userRouter.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const response = await userController.delete(id);
     return res.status(200).json(response);
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return res.status(500).json({
       error: true,
-      message: error.message,
+      message: "Erro ao remover usuário.",
     });
   }
 });
