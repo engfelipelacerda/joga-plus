@@ -111,3 +111,44 @@ Request body:
 ### Delete User
 
 **DELETE** `/users/:id`
+
+## Authentication
+
+The API uses JSON Web Tokens (JWT) for authentication.
+
+### Login
+
+**POST** `/login`
+
+Request body:
+
+```json
+{
+  "username": "player1",
+  "password": "password123"
+}
+```
+
+Successful response:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+### Password Security
+
+Passwords are hashed using bcrypt before being stored in the database.
+
+As a result, passwords are never stored in plain text.
+
+### Environment Variable
+
+The JWT secret key must be configured in the `.env` file:
+
+```env
+JWT_SECRET=your_jwt_secret
+```
+
+This key is used to generate and validate authentication tokens.
