@@ -2,10 +2,11 @@ import express from "express";
 const userRouter = express.Router();
 import userController from "../controller/userController.js";
 import validateUser from "../utils/validateUser.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 // get, post, put, delete
 // quando alguém acessar tal URL execute essa função.
-userRouter.get("/", async (req, res) => {
+userRouter.get("/", authMiddleware, async (req, res) => {
   try {
     const listUsers = await userController.list();
 
@@ -41,7 +42,7 @@ userRouter.post("/", async (req, res) => {
   }
 });
 
-userRouter.put("/:id", async (req, res) => {
+userRouter.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.body;
@@ -64,7 +65,7 @@ userRouter.put("/:id", async (req, res) => {
   }
 });
 
-userRouter.delete("/:id", async (req, res) => {
+userRouter.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const response = await userController.delete(id);

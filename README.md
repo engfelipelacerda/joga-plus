@@ -152,3 +152,80 @@ JWT_SECRET=your_jwt_secret
 ```
 
 This key is used to generate and validate authentication tokens.
+
+## Authentication and Protected Routes
+
+The API uses JSON Web Tokens (JWT) for authentication.
+
+### Public Routes
+
+The following routes can be accessed without authentication:
+
+| Method | Route    |
+| ------ | -------- |
+| POST   | `/users` |
+| POST   | `/login` |
+
+### Protected Routes
+
+The following routes require a valid JWT token:
+
+| Method | Route        |
+| ------ | ------------ |
+| GET    | `/users`     |
+| PUT    | `/users/:id` |
+| DELETE | `/users/:id` |
+
+### Login
+
+To obtain a JWT token, send a request to:
+
+**POST** `/login`
+
+Request body:
+
+```json
+{
+  "username": "player1",
+  "password": "password123"
+}
+```
+
+Successful response:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+### Using the Token in Insomnia
+
+After a successful login, copy the returned token.
+
+#### Bearer Token Authentication
+
+1. Open the request you want to send.
+2. Select the **Auth** tab.
+3. Choose **Bearer Token** as the authentication type.
+4. Paste the JWT token into the **Token** field.
+
+### Authentication Errors
+
+If no token is provided when accessing a protected route:
+
+```json
+{
+  "error": true,
+  "message": "Token não informado."
+}
+```
+
+If the token is invalid or expired:
+
+```json
+{
+  "error": true,
+  "message": "Token inválido."
+}
+```
