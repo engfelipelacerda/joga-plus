@@ -6,20 +6,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 // get, post, put, delete
 // quando alguém acessar tal URL execute essa função.
-userRouter.get("/", authMiddleware, async (req, res) => {
-  try {
-    const listUsers = await userController.list();
-
-    return res.status(200).json(listUsers);
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      error: true,
-      message: "Erro ao listar usuários.",
-    });
-  }
-});
+userRouter.get("/", authMiddleware, userController.list);
 
 userRouter.post("/", async (req, res) => {
   try {
