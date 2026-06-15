@@ -1,0 +1,49 @@
+import bcrypt from 'bcrypt';
+import userModel from '../models/userModel.js';
+import {
+	userRepository,
+	duplicateKeyError,
+	invalidId,
+} from '../repository/user.repository.js';
+import appError from '../domain/appError.js';
+
+async function hashPassword(password) {
+	return await bcrypt.hash(password, 10);
+}
+
+export default new (class userService {
+	async create(user) {
+		// adicionando encriptacao na senha
+		const passwordHash = await hashPassword(user.password);
+		user.password = passwordHash;
+
+		try {
+			const result = await userRepository.createUser(user);
+
+			return result;
+		} catch (error) {
+			if (error instanceof duplicateKeyError)
+				throw new appError('Usuário já registrado com esse username.', 409);
+		}
+	}
+	async list() {
+		const result = await userModel.listAllUsers();
+	}
+	async update(id, user) {
+		const passwordHash = await hashPassword(user.password);
+		user.password = passwordHash;
+
+		try {
+			const result = await userRepository.updateUser(id, user);
+		} catch (error) {
+			if (error instanceof invalidId) throw new appError('ID não encontrado', 404);
+		}
+	}
+	async remove(id) {
+		try {
+			const result = await userRepository.removeUser(id);
+		} catch (error) {
+			if (error instanceof invalidId) throw new appError('ID não encontrado', 404);
+		}
+	}
+})();
