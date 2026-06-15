@@ -1,89 +1,65 @@
-import express from "express";
-import bcrypt from "bcrypt";
+import express from 'express';
+import bcrypt from 'bcrypt';
+import z from 'zod';
 
-import userModel from "../models/userModel.js";
-import validateUser from "../utils/validateUser.js";
+import userBodySchema from '../schemas/user.schema.js';
+import userService from '../services/user.service.js';
 
-export async function list(req,res) {
-    try {
-      const listUsers = await userModel.list()
-      return res.status(200).json(listUsers);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-          error: true,
-          message: "Erro ao listar usuários.",
-        });
-  } 
+export async function list(req, res) {
+	try {
+		const listUsers = await userService.list();
+		return res.status(200).json(listUsers);
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({
+			error: true,
+			message: 'Erro ao listar usuários.',
+		});
+	}
 }
 
-export async function create(req,res) {
-    try {
-      const user = req.body;
+export async function create(req, res, next) {
+	try {
+		// validate before saving the new user
+		const user = userBodySchema.parse(req.body);
 
-      // validate before saving the new user
-      const validation = validateUser(user);
-      if (validation) {
-        return res.status(400).json(validation);
-      }
-
-      // adicionando encriptacao na senha
-      const passwordHash = await bcrypt.hash(user.password, 10);
-      user.password = passwordHash;
-
-      const response = await userModel.create(user);
-      return res.status(201).json(response);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        error: true,
-        message: "Erro ao cadastrar usuário.",
-    });
-  }
+		const response = await userService.create(user);
+		return res.status(201).json(response);
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
 }
 
-export async function update(req,res) {
-    try {
-      const { id } = req.params;
-      const user = req.body;
+export async function update(req, res, next) {
+	try {
+		const paramSchema = z.object({
+			id: z.coerce.number(),
+		});
+		const { id } = paramSchema.parse(req.params);
 
-      // validate before saving the new client
-      const validation = validateUser(user, true);
-      if (validation) {
-        return res.status(400).json(validation);
-      }
+		// validate before saving the new client
+		const user = userBodySchema.parse(req.body);
 
-      if (user.password) {
-        user.password = await bcrypt.hash(user.password, 10);
-      }
-
-      const response = await userModel.update(id, user);
-      return res.status(200).json(response);
-
-    } catch (error) {
-      console.error(error);
-
-      return res.status(500).json({
-        error: true,
-        message: "Erro ao atualizar usuário.",
-      });
-    }
+		const response = await userService.update(id, user);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(error);
+		next(error);
+	}
 }
 
-export async function remove(req,res) {
-    try {
-      const { id } = req.params;
-      const response =await userModel.delete(id);
-      return res.status(200).json(response);
-    } catch (error) {
-      console.error(error);
+export async function remove(req, res) {
+	try {
+		const { id } = req.params;
+		const response = await userService.remove(id);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(error);
 
-      return res.status(500).json({
-        error: true,
-        message: "Erro ao remover usuário.",
-      });
-    }
-  }
-
-
-
+		return res.status(500).json({
+			error: true,
+			message: 'Erro ao remover usuário.',
+		});
+	}
+}
