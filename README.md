@@ -9,7 +9,6 @@ Before running the project, make sure you have installed:
 - Git
 - Node.js
 - Docker
-- Docker Compose
 
 ## Backend Setup
 
@@ -74,26 +73,6 @@ npx prisma db push
 This command creates the database tables based on the Prisma schema.
 
 7. Start the backend server:
-
-```bash
-npm run dev
-```
-
-4. Start the MySQL container:
-
-```bash
-docker compose up -d
-```
-
-The MySQL image will be downloaded automatically if it is not already available.
-
-5. Generate prisma client
-
-```bash
-npx prisma generate
-```
-
-6. Start the backend server:
 
 ```bash
 npm run dev
