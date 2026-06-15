@@ -1,0 +1,21 @@
+{
+	"env": {
+		"browser": true,
+		"es2021": true,
+		"node": true
+	},
+	"extends": ["eslint:recommended", "plugin:prettier/recommended"],
+	"plugins": ["prettier","import"],
+	"rules": {
+		"prettier/prettier": "error",
+		"indent": ["error", 2],
+		"semi": ["error", "always"],
+		"import/extensions":[
+			 "error",
+			 "ignorePackages",
+			 {        
+				"js": "always"
+      			 }
+		]
+	}
+}
