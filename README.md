@@ -42,7 +42,13 @@ docker compose up -d
 
 The MySQL image will be downloaded automatically if it is not already available.
 
-5. Start the backend server:
+5. Generate prisma client
+
+```bash
+npx prisma generate
+```
+
+6. Start the backend server:
 
 ```bash
 npm run dev
