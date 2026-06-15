@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import userModel from '../models/userModel.js';
 import {
 	userRepository,
 	duplicateKeyError,
@@ -27,7 +26,7 @@ export default new (class userService {
 		}
 	}
 	async list() {
-		const result = await userModel.listAllUsers();
+		const result = await userRepository.listAllUsers();
 	}
 	async update(id, user) {
 		const passwordHash = await hashPassword(user.password);
