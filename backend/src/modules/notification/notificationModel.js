@@ -1,76 +1,70 @@
-import connection from "../../database/connection.js";
+import { prisma } from '../../database/connection.js';
 
 class NotificationModel {
-    async create(data) {
-        const sql = `
-      INSERT INTO notificacao (usuario_id, jogo_id, mensagem)
-      VALUES (?, ?, ?);
-    `;
-        const values = [data.usuario_id, data.jogo_id, data.mensagem];
-        const [response] = await connection.query(sql, values);
-        return response;
-    }
+	async create(data) {
+		return await prisma.notifications.create({
+			data: {
+				usuario_id: data.usuario_id,
+				jogo_id: data.jogo_id,
+				mensagem: data.mensagem,
+			},
+		});
+	}
 
-    async findAllByUser(usuario_id) {
-        const sql = `
-      SELECT n.*, g.titulo, g.imagem_url
-      FROM notificacao n
-      JOIN jogos g ON n.jogo_id = g.id
-      WHERE n.usuario_id = ?
-      ORDER BY n.data_envio DESC;
-    `;
-        const [rows] = await connection.query(sql, [usuario_id]);
-        return rows;
-    }
+	async findAllByUser(usuario_id) {
+		return await prisma.notifications.findMany({
+			where: { usuario_id },
+			include: {
+				jogo: { select: { titulo: true, imagem_url: true } },
+			},
+			orderBy: { data_envio: 'desc' },
+		});
+	}
 
-    async findUnreadByUser(usuario_id) {
-        const sql = `
-      SELECT n.*, g.titulo, g.imagem_url
-      FROM notificacao n
-      JOIN jogos g ON n.jogo_id = g.id
-      WHERE n.usuario_id = ? AND n.lida = FALSE
-      ORDER BY n.data_envio DESC;
-    `;
-        const [rows] = await connection.query(sql, [usuario_id]);
-        return rows;
-    }
+	async findUnreadByUser(usuario_id) {
+		return await prisma.notifications.findMany({
+			where: { usuario_id, lida: false },
+			include: {
+				jogo: { select: { titulo: true, imagem_url: true } },
+			},
+			orderBy: { data_envio: 'desc' },
+		});
+	}
 
-    async markAsRead(id, usuario_id) {
-        const sql = `
-      UPDATE notificacao SET lida = TRUE
-      WHERE id = ? AND usuario_id = ?;
-    `;
-        const [response] = await connection.query(sql, [id, usuario_id]);
-        return response;
-    }
+	async markAsRead(id, usuario_id) {
+		const notification = await prisma.notifications.findFirst({
+			where: { id: Number(id), usuario_id },
+		});
+		if (!notification) return null;
+		return await prisma.notifications.update({
+			where: { id: Number(id) },
+			data: { lida: true },
+		});
+	}
 
-    async markAllAsRead(usuario_id) {
-        const sql = `
-      UPDATE notificacao SET lida = TRUE
-      WHERE usuario_id = ? AND lida = FALSE;
-    `;
-        const [response] = await connection.query(sql, [usuario_id]);
-        return response;
-    }
+	async markAllAsRead(usuario_id) {
+		return await prisma.notifications.updateMany({
+			where: { usuario_id, lida: false },
+			data: { lida: true },
+		});
+	}
 
-    async delete(id, usuario_id) {
-        const sql = `
-      DELETE FROM notificacao
-      WHERE id = ? AND usuario_id = ?;
-    `;
-        const [response] = await connection.query(sql, [id, usuario_id]);
-        return response;
-    }
+	async delete(id, usuario_id) {
+		const notification = await prisma.notifications.findFirst({
+			where: { id: Number(id), usuario_id },
+		});
+		if (!notification) return null;
+		return await prisma.notifications.delete({
+			where: { id: Number(id) },
+		});
+	}
 
-    async countUnread(usuario_id) {
-        const sql = `
-      SELECT COUNT(*) AS total
-      FROM notificacao
-      WHERE usuario_id = ? AND lida = FALSE;
-    `;
-        const [rows] = await connection.query(sql, [usuario_id]);
-        return rows[0].total;
-    }
+	async countUnread(usuario_id) {
+		return await prisma.notifications.count({
+			where: { usuario_id, lida: false },
+		});
+	}
 }
 
 export default new NotificationModel();
+

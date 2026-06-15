@@ -1,16 +1,16 @@
 import express from 'express';
 const userRouter = express.Router();
-import { create, list, update, remove } from '../controller/userController.js';
+
+import * as userController from '../controller/userController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 
-// get, post, put, delete
-// quando alguém acessar tal URL execute essa função.
-userRouter.get('/', authMiddleware, list);
+userRouter.get('/', authMiddleware, userController.list);
+userRouter.get('/me', authMiddleware, userController.me);
 
-userRouter.post('/', create);
+userRouter.post('/', userController.create);
 
-userRouter.put('/:id', authMiddleware, update);
+userRouter.put('/:id', authMiddleware, userController.update);
 
-userRouter.delete('/:id', authMiddleware, remove);
+userRouter.delete('/:id', authMiddleware, userController.remove);
 
 export default userRouter;

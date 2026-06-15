@@ -1,54 +1,33 @@
-import connection from "../../database/connection.js";
+import { prisma } from '../../database/connection.js';
 
 class GameModel {
-    async findByCheapsharkId(cheapshark_id) {
-        const sql = `SELECT * FROM games WHERE cheapshark_id = ?`;
-        const [rows] = await connection.query(sql, [cheapshark_id]);
-        return rows[0] || null;
-    }
+	async findByCheapsharkId(cheapshark_id) {
+		return await prisma.games.findUnique({
+			where: { cheapshark_id: String(cheapshark_id) },
+		});
+	}
 
-    async findById(id) {
-        const sql = `SELECT * FROM games WHERE id = ?`;
-        const [rows] = await connection.query(sql, [id]);
-        return rows[0] || null;
-    }
+	async findById(id) {
+		return await prisma.games.findUnique({
+			where: { id: Number(id) },
+		});
+	}
 
-    async create(game) {
-        const sql = `
-      INSERT INTO games
-        (cheapshark_id, titulo, imagem_url, preco_atual, menor_preco, loja)
-      VALUES (?, ?, ?, ?, ?, ?);
-    `;
-        const values = [
-            game.cheapshark_id,
-            game.titulo,
-            game.imagem_url,
-            game.preco_atual,
-            game.menor_preco,
-            game.loja,
-        ];
-        const [response] = await connection.query(sql, values);
-        return response;
-    }
+	async create(game) {
+		return await prisma.games.create({ data: game });
+	}
 
-    async update(cheapshark_id, game) {
-        const sql = `
-      UPDATE games SET
-        preco_atual = ?,
-        menor_preco = ?,
-        loja = ?,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE cheapshark_id = ?;
-    `;
-        const values = [
-            game.preco_atual,
-            game.menor_preco,
-            game.loja,
-            cheapshark_id,
-        ];
-        const [response] = await connection.query(sql, values);
-        return response;
-    }
+	async update(cheapshark_id, game) {
+		return await prisma.games.update({
+			where: { cheapshark_id: String(cheapshark_id) },
+			data: {
+				preco_atual: game.preco_atual,
+				menor_preco: game.menor_preco,
+				loja: game.loja,
+			},
+		});
+	}
 }
 
 export default new GameModel();
+

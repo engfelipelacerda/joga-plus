@@ -16,8 +16,8 @@ class AssessmentModel {
 		return await prisma.assessments.findUnique({
 			where: {
 				usuario_id_jogo_id: {
-					usuario_id,
-					jogo_id,
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
 				},
 			},
 			include: {
@@ -53,7 +53,7 @@ class AssessmentModel {
 	async getAverageByGame(jogo_id) {
 		const result = await prisma.assessments.aggregate({
 			where: {
-				jogo_id,
+				jogo_id: Number(jogo_id),
 			},
 			_avg: {
 				nota: true,
@@ -73,8 +73,8 @@ class AssessmentModel {
 		return await prisma.assessments.update({
 			where: {
 				usuario_id_jogo_id: {
-					usuario_id,
-					jogo_id,
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
 				},
 			},
 			data: {
@@ -89,8 +89,8 @@ class AssessmentModel {
 		return await prisma.assessments.delete({
 			where: {
 				usuario_id_jogo_id: {
-					usuario_id,
-					jogo_id,
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
 				},
 			},
 		});
@@ -98,4 +98,3 @@ class AssessmentModel {
 }
 
 export default new AssessmentModel();
-

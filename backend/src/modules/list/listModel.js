@@ -1,69 +1,99 @@
-import connection from "../../database/connection.js";
+import { prisma } from '../../database/connection.js';
 
 class ListModel {
-    async create(data) {
-        const sql = `
-      INSERT INTO lista (usuario_id, jogo_id, tipo_lista, prioridade)
-      VALUES (?, ?, ?, ?);
-    `;
-        const values = [data.usuario_id, data.jogo_id, data.tipo_lista, data.prioridade ?? 1];
-        const [response] = await connection.query(sql, values);
-        return response;
-    }
+	async create(data) {
+		return await prisma.lists.create({
+			data: {
+				usuario_id: data.usuario_id,
+				jogo_id: data.jogo_id,
+				tipo_lista: data.tipo_lista,
+				prioridade: data.prioridade ?? 1,
+			},
+		});
+	}
 
-    async findByUser(usuario_id) {
-        const sql = `
-      SELECT l.*, g.titulo, g.imagem_url, g.preco_atual, g.menor_preco, g.loja
-      FROM lista l
-      JOIN jogos g ON l.jogo_id = g.id
-      WHERE l.usuario_id = ?
-      ORDER BY l.tipo_lista, l.prioridade DESC;
-    `;
-        const [rows] = await connection.query(sql, [usuario_id]);
-        return rows;
-    }
+	async findByUser(usuario_id) {
+		return await prisma.lists.findMany({
+			where: { usuario_id },
+			include: {
+				jogo: {
+					select: {
+						titulo: true,
+						imagem_url: true,
+						preco_atual: true,
+						menor_preco: true,
+						loja: true,
+					},
+				},
+			},
+			orderBy: [{ tipo_lista: 'asc' }, { prioridade: 'desc' }],
+		});
+	}
 
-    async findByUserAndType(usuario_id, tipo_lista) {
-        const sql = `
-      SELECT l.*, g.titulo, g.imagem_url, g.preco_atual, g.menor_preco, g.loja
-      FROM lista l
-      JOIN jogos g ON l.jogo_id = g.id
-      WHERE l.usuario_id = ? AND l.tipo_lista = ?
-      ORDER BY l.prioridade DESC;
-    `;
-        const [rows] = await connection.query(sql, [usuario_id, tipo_lista]);
-        return rows;
-    }
+	async findByUserAndType(usuario_id, tipo_lista) {
+		return await prisma.lists.findMany({
+			where: { usuario_id, tipo_lista },
+			include: {
+				jogo: {
+					select: {
+						titulo: true,
+						imagem_url: true,
+						preco_atual: true,
+						menor_preco: true,
+						loja: true,
+					},
+				},
+			},
+			orderBy: { prioridade: 'desc' },
+		});
+	}
 
-    async findByUserAndGame(usuario_id, jogo_id) {
-        const sql = `SELECT * FROM lista WHERE usuario_id = ? AND jogo_id = ?`;
-        const [rows] = await connection.query(sql, [usuario_id, jogo_id]);
-        return rows[0] || null;
-    }
+	async findByUserAndGame(usuario_id, jogo_id) {
+		return await prisma.lists.findUnique({
+			where: {
+				usuario_id_jogo_id: {
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
+				},
+			},
+		});
+	}
 
-    async updateType(usuario_id, jogo_id, tipo_lista) {
-        const sql = `
-      UPDATE lista SET tipo_lista = ?
-      WHERE usuario_id = ? AND jogo_id = ?;
-    `;
-        const [response] = await connection.query(sql, [tipo_lista, usuario_id, jogo_id]);
-        return response;
-    }
+	async updateType(usuario_id, jogo_id, tipo_lista) {
+		return await prisma.lists.update({
+			where: {
+				usuario_id_jogo_id: {
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
+				},
+			},
+			data: { tipo_lista },
+		});
+	}
 
-    async updatePriority(usuario_id, jogo_id, prioridade) {
-        const sql = `
-      UPDATE lista SET prioridade = ?
-      WHERE usuario_id = ? AND jogo_id = ?;
-    `;
-        const [response] = await connection.query(sql, [prioridade, usuario_id, jogo_id]);
-        return response;
-    }
+	async updatePriority(usuario_id, jogo_id, prioridade) {
+		return await prisma.lists.update({
+			where: {
+				usuario_id_jogo_id: {
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
+				},
+			},
+			data: { prioridade: Number(prioridade) },
+		});
+	}
 
-    async delete(usuario_id, jogo_id) {
-        const sql = `DELETE FROM lista WHERE usuario_id = ? AND jogo_id = ?;`;
-        const [response] = await connection.query(sql, [usuario_id, jogo_id]);
-        return response;
-    }
+	async delete(usuario_id, jogo_id) {
+		return await prisma.lists.delete({
+			where: {
+				usuario_id_jogo_id: {
+					usuario_id: Number(usuario_id),
+					jogo_id: Number(jogo_id),
+				},
+			},
+		});
+	}
 }
 
 export default new ListModel();
+

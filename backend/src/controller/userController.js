@@ -1,5 +1,3 @@
-import express from 'express';
-import bcrypt from 'bcrypt';
 import z from 'zod';
 
 import userBodySchema from '../schemas/user.schema.js';
@@ -14,6 +12,28 @@ export async function list(req, res) {
 		return res.status(500).json({
 			error: true,
 			message: 'Erro ao listar usuários.',
+		});
+	}
+}
+
+export async function me(req, res) {
+	try {
+		const response = await userService.findById(req.user.id);
+
+		if (!response) {
+			return res.status(404).json({
+				error: true,
+				message: 'Usuário não encontrado.',
+			});
+		}
+
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(error);
+
+		return res.status(500).json({
+			error: true,
+			message: 'Erro ao buscar usuário.',
 		});
 	}
 }
@@ -51,8 +71,14 @@ export async function update(req, res, next) {
 
 export async function remove(req, res) {
 	try {
-		const { id } = req.params;
+		const paramSchema = z.object({
+			id: z.coerce.number(),
+		});
+
+		const { id } = paramSchema.parse(req.params);
+
 		const response = await userService.remove(id);
+
 		return res.status(200).json(response);
 	} catch (error) {
 		console.error(error);

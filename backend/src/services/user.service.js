@@ -11,6 +11,10 @@ async function hashPassword(password) {
 }
 
 export default new (class userService {
+	async findById(id) {
+		return await userRepository.findById(id);
+	}
+
 	async create(user) {
 		// adicionando encriptacao na senha
 		const passwordHash = await hashPassword(user.password);
@@ -22,7 +26,8 @@ export default new (class userService {
 			return result;
 		} catch (error) {
 			if (error instanceof duplicateKeyError)
-				throw new appError('Usuário já registrado com esse username.', 409);
+				throw new appError('username ou email já cadastrado', 409);
+			throw error;
 		}
 	}
 	async list() {
@@ -34,15 +39,19 @@ export default new (class userService {
 
 		try {
 			const result = await userRepository.updateUser(id, user);
+			return result;
 		} catch (error) {
 			if (error instanceof invalidId) throw new appError('ID não encontrado', 404);
+			throw error;
 		}
 	}
 	async remove(id) {
 		try {
 			const result = await userRepository.removeUser(id);
+			return result;
 		} catch (error) {
 			if (error instanceof invalidId) throw new appError('ID não encontrado', 404);
+			throw error;
 		}
 	}
 })();

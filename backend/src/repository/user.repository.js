@@ -5,15 +5,20 @@ export class invalidId extends Error {}
 
 class _userRepository {
 	async listAllUsers() {
-		return await prisma.users.findMany({
-			select: {
-				id: true,
-				username: true,
-				email: true,
-				birth_date: true,
-				created_at: true,
-			},
-		});
+		try {
+			return await prisma.users.findMany({
+				select: {
+					id: true,
+					username: true,
+					email: true,
+					birth_date: true,
+					created_at: true,
+				},
+			});
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
 	}
 
 	async createUser(data) {
@@ -34,6 +39,7 @@ class _userRepository {
 			});
 		} catch (error) {
 			if (error.code == 'P2025') throw new invalidId();
+			throw error;
 		}
 	}
 
@@ -45,6 +51,19 @@ class _userRepository {
 		} catch (error) {}
 	}
 
+	async findById(id) {
+		return prisma.users.findUnique({
+			where: { id },
+			select: {
+				id: true,
+				username: true,
+				email: true,
+				birth_date: true,
+				created_at: true,
+			},
+		});
+	}
+
 	async removeUser(id) {
 		try {
 			return await prisma.users.delete({
@@ -52,6 +71,7 @@ class _userRepository {
 			});
 		} catch (error) {
 			if (error.code == 'P2025') throw new invalidId();
+			throw error;
 		}
 	}
 }
