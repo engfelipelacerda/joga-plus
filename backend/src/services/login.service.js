@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 
 import appError from '../domain/appError.js';
 import { userRepository } from '../repository/user.repository.js';

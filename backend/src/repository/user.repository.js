@@ -1,4 +1,3 @@
-import { Prisma } from '../generated/prisma/client.ts';
 import { prisma } from '../database/connection.js';
 
 export class duplicateKeyError extends Error {}
@@ -6,7 +5,15 @@ export class invalidId extends Error {}
 
 class _userRepository {
 	async listAllUsers() {
-		return await prisma.users.findMany();
+		return await prisma.users.findMany({
+			select: {
+				id: true,
+				username: true,
+				email: true,
+				birth_date: true,
+				created_at: true,
+			},
+		});
 	}
 
 	async createUser(data) {

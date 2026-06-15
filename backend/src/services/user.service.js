@@ -26,7 +26,7 @@ export default new (class userService {
 		}
 	}
 	async list() {
-		const result = await userRepository.listAllUsers();
+		return await userRepository.listAllUsers();
 	}
 	async update(id, user) {
 		const passwordHash = await hashPassword(user.password);

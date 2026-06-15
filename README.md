@@ -26,6 +26,21 @@ cd joga-plus/backend
 npm install
 ```
 
+3. ## Backend Setup
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/engfelipelacerda/joga-plus.git
+cd joga-plus/backend
+```
+
+2. Install the project dependencies:
+
+```bash
+npm install
+```
+
 3. Create a `.env` file based on `.env.example`:
 
 ```bash
@@ -33,6 +48,36 @@ cp .env.example .env
 ```
 
 If your operating system does not support this command, create a `.env` file manually and copy the contents from `.env.example`.
+
+Review the variables and update them according to your local environment, especially the database credentials and `DATABASE_URL`.
+
+4. Start the MySQL container:
+
+```bash
+docker compose up -d
+```
+
+The MySQL image will be downloaded automatically if it is not already available.
+
+5. Generate the Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+6. Create/update the database schema:
+
+```bash
+npx prisma db push
+```
+
+This command creates the database tables based on the Prisma schema.
+
+7. Start the backend server:
+
+```bash
+npm run dev
+```
 
 4. Start the MySQL container:
 
@@ -149,16 +194,6 @@ Passwords are hashed using bcrypt before being stored in the database.
 
 As a result, passwords are never stored in plain text.
 
-### Environment Variable
-
-The JWT secret key must be configured in the `.env` file:
-
-```env
-JWT_SECRET=your_jwt_secret
-```
-
-This key is used to generate and validate authentication tokens.
-
 ## Authentication and Protected Routes
 
 The API uses JSON Web Tokens (JWT) for authentication.
@@ -167,10 +202,10 @@ The API uses JSON Web Tokens (JWT) for authentication.
 
 The following routes can be accessed without authentication:
 
-| Method | Route    |
-| ------ | -------- |
-| POST   | `/users` |
-| POST   | `/login` |
+| Method | Route         |
+| ------ | ------------- |
+| POST   | `/users`      |
+| POST   | `/auth/login` |
 
 ### Protected Routes
 
@@ -186,7 +221,7 @@ The following routes require a valid JWT token:
 
 To obtain a JWT token, send a request to:
 
-**POST** `/login`
+**POST** `/auth/login`
 
 Request body:
 
