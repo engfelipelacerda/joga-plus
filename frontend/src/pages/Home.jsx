@@ -1,84 +1,142 @@
-import { ArrowRight, Trophy, Users, Calendar } from "lucide-react";
+import { ArrowRight, Zap, Layers, Eye, LogIn } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <header className="flex items-center justify-between px-8 py-6">
-        <h1 className="text-3xl font-extrabold text-orange-500">
-          Joga<span className="text-gray-900">+</span>
-        </h1>
-
-        <button
-          onClick={() => (window.location.href = "/login")}
-          className="rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600"
-        >
-          Entrar
-        </button>
+    <div className="landing-shell">
+      <header className="landing-header">
+        <div className="brand">
+          Joga<span>+</span>
+        </div>
+        <nav className="header-nav">
+          <button className="nav-link">Sobre</button>
+          <button className="nav-link">Recursos</button>
+          <button className="nav-link">Contato</button>
+          <button className="cta-button" onClick={() => (window.location.href = "/login")}>
+            <LogIn size={18} />
+            Entrar
+          </button>
+        </nav>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto flex max-w-7xl flex-col items-center px-8 py-20 text-center">
-        <div className="mb-6 rounded-full bg-orange-100 px-4 py-2 text-sm font-medium text-orange-600">
-          Plataforma para atletas e organizadores
+      <main className="landing-main">
+        <section className="hero">
+          <div className="hero-content">
+            <h1>Organize seus jogos. Descubra mais. Escolha melhor.</h1>
+            <p>
+              Joga+ é a plataforma ideal para gerenciar sua biblioteca de jogos, filtrar
+              por preferências e encontrar exatamente o que você quer jogar no momento.
+            </p>
+            <div className="hero-actions">
+              <button 
+                className="primary-cta"
+                onClick={() => (window.location.href = "/login")}
+              >
+                Começar Agora
+                <ArrowRight size={20} />
+              </button>
+              <button className="secondary-cta">Saber Mais</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="benefits">
+          <h2>Por que usar Joga+?</h2>
+          <div className="benefits-grid">
+            <div className="benefit-card">
+              <div className="benefit-icon">
+                <Layers size={32} />
+              </div>
+              <h3>Organize com Facilidade</h3>
+              <p>
+                Crie listas personalizadas, organize jogos por interesse e mantenha
+                seu acervo sempre atualizado e acessível.
+              </p>
+            </div>
+
+            <div className="benefit-card">
+              <div className="benefit-icon">
+                <Zap size={32} />
+              </div>
+              <h3>Selecione Rapidamente</h3>
+              <p>
+                Filtros inteligentes e busca avançada para encontrar o jogo perfeito
+                para o seu mood do momento em segundos.
+              </p>
+            </div>
+
+            <div className="benefit-card">
+              <div className="benefit-icon">
+                <Eye size={32} />
+              </div>
+              <h3>Visualize Tudo</h3>
+              <p>
+                Veja capas, avaliações, gêneros e mais informações em um visual limpo
+                e intuitivo que facilita sua escolha.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="features">
+          <div className="features-container">
+            <div className="feature-block">
+              <h3>Biblioteca Centralizada</h3>
+              <p>
+                Todos os seus jogos em um único lugar. Sem mais procurar em vários apps
+                ou plataformas. Tudo organizado do seu jeito.
+              </p>
+            </div>
+
+            <div className="feature-block">
+              <h3>Filtros Inteligentes</h3>
+              <p>
+                Busque por gênero, plataforma, avaliação ou qualquer critério que importa
+                para você. Encontre o jogo certo na hora certa.
+              </p>
+            </div>
+
+            <div className="feature-block">
+              <h3>Favoritos e Listas</h3>
+              <p>
+                Marque seus favoritos e crie listas temáticas. Nunca mais esqueça aquele
+                jogo que você queria experimentar.
+              </p>
+            </div>
+
+            <div className="feature-block">
+              <h3>Interface Moderna</h3>
+              <p>
+                Design limpo e responsivo que funciona perfeitamente em qualquer
+                dispositivo. Simples e direto.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="cta-section">
+          <div className="cta-box">
+            <h2>Pronto para organizar sua biblioteca?</h2>
+            <p>Comece agora e descubra uma nova forma de escolher seus jogos.</p>
+            <button 
+              className="primary-cta large"
+              onClick={() => (window.location.href = "/login")}
+            >
+              Entrar em Joga+
+              <ArrowRight size={20} />
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer className="landing-footer">
+        <div className="footer-content">
+          <p>&copy; 2026 Joga+. Organize, selecione, aproveite.</p>
+          <div className="footer-links">
+            <a href="#">Privacidade</a>
+            <a href="#">Termos</a>
+            <a href="#">Suporte</a>
+          </div>
         </div>
-
-        <h2 className="max-w-4xl text-6xl font-black leading-tight text-gray-900">
-          Organize partidas,
-          <span className="block text-orange-500">encontre jogadores</span>e
-          jogue mais.
-        </h2>
-
-        <p className="mt-8 max-w-2xl text-xl text-gray-600">
-          O Joga+ conecta atletas, equipes e organizadores em um único ambiente
-          simples, moderno e intuitivo.
-        </p>
-
-        <div className="mt-12 flex gap-4">
-          <button
-            onClick={() => (window.location.href = "/login")}
-            className="flex items-center gap-2 rounded-2xl bg-orange-500 px-8 py-4 text-lg font-bold text-white transition hover:scale-105 hover:bg-orange-600"
-          >
-            Começar Agora
-            <ArrowRight size={20} />
-          </button>
-
-          <button className="rounded-2xl border-2 border-orange-500 px-8 py-4 text-lg font-bold text-orange-500 transition hover:bg-orange-50">
-            Saiba Mais
-          </button>
-        </div>
-      </section>
-
-      {/* Cards */}
-      <section className="mx-auto grid max-w-6xl gap-8 px-8 pb-24 md:grid-cols-3">
-        <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-lg transition hover:-translate-y-2">
-          <Users size={42} className="text-orange-500" />
-          <h3 className="mt-4 text-2xl font-bold">Comunidade</h3>
-          <p className="mt-3 text-gray-600">
-            Encontre atletas, monte equipes e expanda sua rede esportiva.
-          </p>
-        </div>
-
-        <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-lg transition hover:-translate-y-2">
-          <Calendar size={42} className="text-orange-500" />
-          <h3 className="mt-4 text-2xl font-bold">Organização</h3>
-          <p className="mt-3 text-gray-600">
-            Gerencie partidas, horários e eventos esportivos com facilidade.
-          </p>
-        </div>
-
-        <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-lg transition hover:-translate-y-2">
-          <Trophy size={42} className="text-orange-500" />
-          <h3 className="mt-4 text-2xl font-bold">Competição</h3>
-          <p className="mt-3 text-gray-600">
-            Acompanhe estatísticas, rankings e evolução dos jogadores.
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-8 text-center text-gray-500">
-        © 2026 Joga+ • Todos os direitos reservados
       </footer>
     </div>
   );
