@@ -1,6 +1,4 @@
-# Joga Plus
-
-Your personal hub for organizing and tracking video game collections.
+# Joga Plus BACKEND
 
 ## Prerequisites
 
@@ -112,10 +110,10 @@ Request body:
 
 ```json
 {
-  "username": "player1",
-  "email": "player1@example.com",
-  "birth_date": "2000-01-01",
-  "password": "password123"
+	"username": "player1",
+	"email": "player1@example.com",
+	"birth_date": "2000-01-01",
+	"password": "password123"
 }
 ```
 
@@ -127,10 +125,10 @@ Request body:
 
 ```json
 {
-  "username": "player2",
-  "email": "player2@example.com",
-  "birth_date": "2000-01-01",
-  "password": "newpassword123"
+	"username": "player2",
+	"email": "player2@example.com",
+	"birth_date": "2000-01-01",
+	"password": "newpassword123"
 }
 ```
 
@@ -154,8 +152,8 @@ Request body:
 
 ```json
 {
-  "username": "player1",
-  "password": "password123"
+	"username": "player1",
+	"password": "password123"
 }
 ```
 
@@ -163,7 +161,7 @@ Successful response:
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs..."
+	"token": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
 
@@ -206,8 +204,8 @@ Request body:
 
 ```json
 {
-  "username": "player1",
-  "password": "password123"
+	"username": "player1",
+	"password": "password123"
 }
 ```
 
@@ -215,7 +213,7 @@ Successful response:
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs..."
+	"token": "eyJhbGciOiJIUzI1NiIs..."
 }
 ```
 
@@ -236,8 +234,8 @@ If no token is provided when accessing a protected route:
 
 ```json
 {
-  "error": true,
-  "message": "Token não informado."
+	"error": true,
+	"message": "Token não informado."
 }
 ```
 
@@ -245,7 +243,7 @@ If the token is invalid or expired:
 
 ```json
 {
-  "error": true,
-  "message": "Token inválido."
+	"error": true,
+	"message": "Token inválido."
 }
 ```
