@@ -10,11 +10,11 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
     setLoading(true);
 
     try {
+      console.log("1 - Antes do fetch");
       const response = await fetch("http://localhost:3333/auth/login", {
         method: "POST",
         headers: {
@@ -25,6 +25,7 @@ export default function Login() {
           password,
         }),
       });
+      console.log("2 - Recebi resposta");
 
       const data = await response.json();
 
@@ -35,7 +36,7 @@ export default function Login() {
         throw new Error(data.message || "Usuário ou senha inválidos.");
       }
 
-      // Se o backend retornar um token JWT
+      // backend retorna um token JWT que é salvo
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
