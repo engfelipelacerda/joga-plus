@@ -86,7 +86,7 @@ export default function Register() {
                 <input
                   id="name"
                   type="text"
-                  placeholder="username"
+                  placeholder="Seu novo username"
                   value={username}
                   onChange={(e) => setUserName(e.target.value)}
                   required

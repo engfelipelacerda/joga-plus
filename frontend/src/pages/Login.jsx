@@ -1,28 +1,53 @@
-import { useState } from 'react';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { User, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+
+    setError("");
     setLoading(true);
 
     try {
-      // TODO: Integrar com backend
-      console.log({ email, password });
-      // Simulação de login bem-sucedido
-      setTimeout(() => {
-        setLoading(false);
-        // window.location.href = '/dashboard';
-      }, 1000);
+      const response = await fetch("http://localhost:3333/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("Status:", response.status);
+      console.log("Resposta:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Usuário ou senha inválidos.");
+      }
+
+      // Se o backend retornar um token JWT
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      console.log("Login realizado com sucesso!");
+
+      window.location.href = "/";
     } catch (err) {
-      setError('Erro ao fazer login. Tente novamente.');
+      console.error(err);
+
+      setError(err.message || "Erro ao fazer login.");
+    } finally {
       setLoading(false);
     }
   };
@@ -32,21 +57,23 @@ export default function Login() {
       <div className="login-left">
         <div className="login-content">
           <div className="login-header">
-            <h1>Joga<span>+</span></h1>
+            <h1>
+              Joga<span>+</span>
+            </h1>
             <p>Bem-vindo de volta</p>
           </div>
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="username">Username</label>
               <div className="input-wrapper">
-                <Mail size={18} />
+                <User size={18} />
                 <input
-                  id="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="username"
+                  type="text"
+                  placeholder="Seu username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -58,7 +85,7 @@ export default function Login() {
                 <Lock size={18} />
                 <input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -77,7 +104,7 @@ export default function Login() {
             {error && <div className="error-message">{error}</div>}
 
             <button type="submit" className="submit-button" disabled={loading}>
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? "Entrando..." : "Entrar"}
               <ArrowRight size={18} />
             </button>
           </form>
@@ -85,8 +112,14 @@ export default function Login() {
           <div className="login-divider">ou</div>
 
           <div className="login-footer">
-            <p>Não tem conta? <a href="/register">Criar conta</a></p>
-            <p><a href="/forgot-password" className="forgot-link">Esqueci minha senha</a></p>
+            <p>
+              Não tem conta? <a href="/register">Criar conta</a>
+            </p>
+            <p>
+              <a href="/forgot-password" className="forgot-link">
+                Esqueci minha senha
+              </a>
+            </p>
           </div>
         </div>
       </div>
