@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Bell,
@@ -11,14 +11,17 @@ import {
   ChevronDown,
   Play,
   Sparkles,
-} from 'lucide-react';
+  LogOut,
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 const mockGames = [
   {
     id: 1,
-    title: 'Nebula Outlaws',
-    genre: 'Ação | Ficção',
-    cover: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
+    title: "Nebula Outlaws",
+    genre: "Ação | Ficção",
+    cover:
+      "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
     progress: 72,
     price: 59.99,
     promoPrice: 29.99,
@@ -27,9 +30,10 @@ const mockGames = [
   },
   {
     id: 2,
-    title: 'Midnight Drift',
-    genre: 'Corrida | Arcade',
-    cover: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=801&q=80',
+    title: "Midnight Drift",
+    genre: "Corrida | Arcade",
+    cover:
+      "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=801&q=80",
     progress: 38,
     price: 49.99,
     promoPrice: 24.99,
@@ -38,9 +42,10 @@ const mockGames = [
   },
   {
     id: 3,
-    title: 'Aeon Frontier',
-    genre: 'RPG | Aventura',
-    cover: 'https://images.unsplash.com/photo-1526059959458-7130b91c7bf8?auto=format&fit=crop&w=800&q=80',
+    title: "Aeon Frontier",
+    genre: "RPG | Aventura",
+    cover:
+      "https://images.unsplash.com/photo-1526059959458-7130b91c7bf8?auto=format&fit=crop&w=800&q=80",
     progress: 56,
     price: 79.99,
     promoPrice: 39.99,
@@ -49,9 +54,10 @@ const mockGames = [
   },
   {
     id: 4,
-    title: 'Shadow Protocol',
-    genre: 'Stealth | Tiro',
-    cover: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80',
+    title: "Shadow Protocol",
+    genre: "Stealth | Tiro",
+    cover:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
     progress: 15,
     price: 69.99,
     promoPrice: 34.99,
@@ -60,9 +66,10 @@ const mockGames = [
   },
   {
     id: 5,
-    title: 'Solar Harvest',
-    genre: 'Simulação | Estratégia',
-    cover: 'https://images.unsplash.com/photo-1522202222199-0c502491d60f?auto=format&fit=crop&w=800&q=80',
+    title: "Solar Harvest",
+    genre: "Simulação | Estratégia",
+    cover:
+      "https://images.unsplash.com/photo-1522202222199-0c502491d60f?auto=format&fit=crop&w=800&q=80",
     progress: 82,
     price: 34.99,
     promoPrice: 17.49,
@@ -72,7 +79,7 @@ const mockGames = [
 ];
 
 const SidebarButton = ({ icon, label, active, onClick }) => (
-  <button type="button" className={active ? 'active' : ''} onClick={onClick}>
+  <button type="button" className={active ? "active" : ""} onClick={onClick}>
     {icon}
     {label}
   </button>
@@ -80,7 +87,10 @@ const SidebarButton = ({ icon, label, active, onClick }) => (
 
 const GameCard = ({ game, onToggleFavorite }) => (
   <div className="game-card">
-    <div className="card-cover" style={{ backgroundImage: `url(${game.cover})` }} />
+    <div
+      className="card-cover"
+      style={{ backgroundImage: `url(${game.cover})` }}
+    />
     <div className="card-body">
       <div>
         <h4>{game.title}</h4>
@@ -91,12 +101,12 @@ const GameCard = ({ game, onToggleFavorite }) => (
           <Play size={16} /> Jogar
         </button>
         <button
-          className={`favorite-button ${game.favorite ? 'favorited' : ''}`}
+          className={`favorite-button ${game.favorite ? "favorited" : ""}`}
           onClick={() => onToggleFavorite(game.id)}
           type="button"
         >
           <Heart size={16} />
-          {game.favorite ? 'Favorito' : 'Favoritar'}
+          {game.favorite ? "Favorito" : "Favoritar"}
         </button>
       </div>
     </div>
@@ -105,7 +115,10 @@ const GameCard = ({ game, onToggleFavorite }) => (
 
 const PromotionCard = ({ game }) => (
   <div className="promotion-card">
-    <div className="card-cover" style={{ backgroundImage: `url(${game.cover})` }} />
+    <div
+      className="card-cover"
+      style={{ backgroundImage: `url(${game.cover})` }}
+    />
     <div className="card-body promotion-content">
       <h4>{game.title}</h4>
       <div className="promotion-discount">-{game.discount}%</div>
@@ -123,8 +136,13 @@ const HeroBanner = () => (
     <div className="hero-text">
       <div className="section-heading">
         <div>
-          <h2>Nova temporada: <span>Rocket Rebellion</span></h2>
-          <p>Combates em ritmo acelerado, mapa dinâmico e recompensas exclusivas para jogadores competitivos.</p>
+          <h2>
+            Nova temporada: <span>Rocket Rebellion</span>
+          </h2>
+          <p>
+            Combates em ritmo acelerado, mapa dinâmico e recompensas exclusivas
+            para jogadores competitivos.
+          </p>
         </div>
       </div>
       <div className="hero-actions">
@@ -152,74 +170,119 @@ const SearchBar = ({ search, setSearch }) => (
   </label>
 );
 
+// Retorna a inicial do username em maiúsculo
+function getInitial(user) {
+  if (!user?.username) return "?";
+  return user.username[0].toUpperCase();
+}
+
 export default function Menu() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
   const [games, setGames] = useState(mockGames);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const filteredGames = useMemo(() => {
-    return games.filter((game) =>
-      game.title.toLowerCase().includes(search.toLowerCase()) ||
-      game.genre.toLowerCase().includes(search.toLowerCase())
+    return games.filter(
+      (game) =>
+        game.title.toLowerCase().includes(search.toLowerCase()) ||
+        game.genre.toLowerCase().includes(search.toLowerCase()),
     );
   }, [games, search]);
 
-  const favorites = useMemo(() => games.filter((game) => game.favorite), [games]);
+  const favorites = useMemo(
+    () => games.filter((game) => game.favorite),
+    [games],
+  );
 
   const continuePlaying = useMemo(
     () => games.filter((game) => game.progress > 0).slice(0, 4),
-    [games]
+    [games],
   );
 
   const promotions = useMemo(
     () => games.filter((game) => game.discount > 0).slice(0, 3),
-    [games]
+    [games],
   );
 
   const handleToggleFavorite = (id) => {
     setGames((current) =>
       current.map((game) =>
-        game.id === id ? { ...game, favorite: !game.favorite } : game
-      )
+        game.id === id ? { ...game, favorite: !game.favorite } : game,
+      ),
     );
   };
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
 
   return (
     <div className="menu-shell">
       <aside className="menu-sidebar">
         <div className="sidebar-brand">
-          <h2>Joga<span>+</span></h2>
+          <h2>
+            Joga<span>+</span>
+          </h2>
           <ChevronDown size={20} />
         </div>
 
         <nav className="sidebar-nav">
           <SidebarButton icon={<Home size={18} />} label="Início" active />
-          <SidebarButton icon={<Tag size={18} />} label="Biblioteca" onClick={() => navigate('/library')} />
+          <SidebarButton
+            icon={<Tag size={18} />}
+            label="Biblioteca"
+            onClick={() => navigate("/library")}
+          />
           <SidebarButton icon={<Heart size={18} />} label="Favoritos" />
           <SidebarButton icon={<Sparkles size={18} />} label="Promoções" />
           <SidebarButton icon={<Star size={18} />} label="Perfil" />
           <SidebarButton icon={<Settings size={18} />} label="Configurações" />
         </nav>
 
+        {/* Rodapé do sidebar: nome real + botão de logout */}
         <div className="sidebar-footer">
-          Bem-vindo, jogador!
+          {user ? (
+            <>
+              <span>
+                Olá, <strong>{user.username}</strong>!
+              </span>
+              <button
+                type="button"
+                className="logout-button"
+                onClick={handleLogout}
+                title="Sair"
+              >
+                <LogOut size={16} />
+                Sair
+              </button>
+            </>
+          ) : (
+            <span>Carregando...</span>
+          )}
         </div>
       </aside>
 
       <main className="menu-content">
         <header className="menu-header">
           <div className="app-title">
-            <h1>Menu <span>Joga+</span></h1>
+            <h1>
+              Menu <span>Joga+</span>
+            </h1>
           </div>
           <SearchBar search={search} setSearch={setSearch} />
           <div className="header-actions">
             <button className="icon-button" type="button">
               <Bell size={20} />
             </button>
+
+            {/* Chip do usuário com dados reais */}
             <div className="user-chip">
-              <div className="avatar-placeholder">J</div>
+              <div className="avatar-placeholder">{getInitial(user)}</div>
               <div>
-                <span>João Gamer</span>
+                <span>{user?.username ?? "..."}</span>
                 <small>Online</small>
               </div>
             </div>
@@ -236,12 +299,18 @@ export default function Menu() {
           <div className="continue-row">
             {continuePlaying.map((game) => (
               <div key={game.id} className="game-card">
-                <div className="card-cover" style={{ backgroundImage: `url(${game.cover})` }} />
+                <div
+                  className="card-cover"
+                  style={{ backgroundImage: `url(${game.cover})` }}
+                />
                 <div className="card-body">
                   <h4>{game.title}</h4>
                   <div className="card-meta">{game.genre}</div>
                   <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${game.progress}%` }} />
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${game.progress}%` }}
+                    />
                   </div>
                   <div className="card-actions">
                     <button className="play-button">Continuar</button>
@@ -259,7 +328,11 @@ export default function Menu() {
           </div>
           <div className="library-grid">
             {filteredGames.map((game) => (
-              <GameCard key={game.id} game={game} onToggleFavorite={handleToggleFavorite} />
+              <GameCard
+                key={game.id}
+                game={game}
+                onToggleFavorite={handleToggleFavorite}
+              />
             ))}
           </div>
         </section>
@@ -284,11 +357,16 @@ export default function Menu() {
           <div className="favorites-grid">
             {favorites.length > 0 ? (
               favorites.map((game) => (
-                <GameCard key={game.id} game={game} onToggleFavorite={handleToggleFavorite} />
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  onToggleFavorite={handleToggleFavorite}
+                />
               ))
             ) : (
               <div className="empty-state">
-                Nenhum favorito ainda. Clique no coração para marcar seus jogos preferidos.
+                Nenhum favorito ainda. Clique no coração para marcar seus jogos
+                preferidos.
               </div>
             )}
           </div>

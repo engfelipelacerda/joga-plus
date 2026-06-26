@@ -1,48 +1,41 @@
 import { useState } from "react";
+import { useNavigate, Navigate } from "react-router-dom";
 import { User, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../services/api";
 
 export default function Login() {
+  const { login, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // Se já estiver logado, manda direto pro menu
+  if (!loading && isAuthenticated) {
+    return <Navigate to="/menu" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3333/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
+      const data = await api.post("/auth/login", { username, password });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Usuário ou senha inválidos.");
-      }
-
-      // backend retorna um token JWT que é salvo
       if (data.token) {
-        localStorage.setItem("token", data.token);
+        login(data.token); // salva token + carrega usuário no contexto
       }
 
-      window.location.href = "/";
+      navigate("/menu");
     } catch (err) {
-      console.error(err);
-
-      setError(err.message || "Erro ao fazer login.");
+      setError(err.message || "Usuário ou senha inválidos.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -97,8 +90,12 @@ export default function Login() {
 
             {error && <div className="error-message">{error}</div>}
 
-            <button type="submit" className="submit-button" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={submitting}
+            >
+              {submitting ? "Entrando..." : "Entrar"}
               <ArrowRight size={18} />
             </button>
           </form>
@@ -108,11 +105,6 @@ export default function Login() {
           <div className="login-footer">
             <p>
               Não tem conta? <a href="/register">Criar conta</a>
-            </p>
-            <p>
-              <a href="/forgot-password" className="forgot-link">
-                Esqueci minha senha
-              </a>
             </p>
           </div>
         </div>

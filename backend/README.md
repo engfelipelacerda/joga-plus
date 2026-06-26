@@ -71,20 +71,6 @@ This command starts both the **MySQL** database and **Adminer**. If the images a
 http://localhost:8080
 ```
 
-Adminer provides a web interface for viewing and managing the database.
-
-Use the same database credentials defined in your `.env` file to log in. With the example configuration above:
-
-| Field    | Value       |
-| -------- | ----------- |
-| System   | MySQL       |
-| Server   | mysql       |
-| Username | user        |
-| Password | user123     |
-| Database | db_jogaplus |
-
-> **Note:** When accessing Adminer from the Docker Compose network, the **Server** must be `mysql`, which is the name of the MySQL service, not `localhost`.
-
 5. Generate the Prisma Client:
 
 ```bash
@@ -98,6 +84,20 @@ npx prisma db push
 ```
 
 This command creates the database tables based on the Prisma schema.
+
+Adminer provides a web interface for viewing and managing the database.
+
+Use the same database credentials defined in your `.env` file to log in. With the example configuration above:
+
+| Field    | Value       |
+| -------- | ----------- |
+| System   | MySQL       |
+| Server   | mysql       |
+| Username | user        |
+| Password | user123     |
+| Database | db_jogaplus |
+
+> **Note:** When accessing Adminer from the Docker Compose network, the **Server** must be `mysql`, which is the name of the MySQL service, not `localhost`.
 
 7. Start the backend server:
 

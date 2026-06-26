@@ -1,6 +1,16 @@
 import { ArrowRight, Zap, Layers, Eye, LogIn } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Home() {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Usuário já logado → manda direto pro menu
+  if (!loading && isAuthenticated) {
+    return <Navigate to="/menu" replace />;
+  }
+
   return (
     <div className="landing-shell">
       <header className="landing-header">
@@ -11,7 +21,7 @@ export default function Home() {
           <button className="nav-link">Sobre</button>
           <button className="nav-link">Recursos</button>
           <button className="nav-link">Contato</button>
-          <button className="cta-button" onClick={() => (window.location.href = "/login")}>
+          <button className="cta-button" onClick={() => navigate("/login")}>
             <LogIn size={18} />
             Entrar
           </button>
@@ -23,13 +33,14 @@ export default function Home() {
           <div className="hero-content">
             <h1>Organize seus jogos. Descubra mais. Escolha melhor.</h1>
             <p>
-              Joga+ é a plataforma ideal para gerenciar sua biblioteca de jogos, filtrar
-              por preferências e encontrar exatamente o que você quer jogar no momento.
+              Joga+ é a plataforma ideal para gerenciar sua biblioteca de jogos,
+              filtrar por preferências e encontrar exatamente o que você quer
+              jogar no momento.
             </p>
             <div className="hero-actions">
-              <button 
+              <button
                 className="primary-cta"
-                onClick={() => (window.location.href = "/login")}
+                onClick={() => navigate("/login")}
               >
                 Começar Agora
                 <ArrowRight size={20} />
@@ -48,8 +59,8 @@ export default function Home() {
               </div>
               <h3>Organize com Facilidade</h3>
               <p>
-                Crie listas personalizadas, organize jogos por interesse e mantenha
-                seu acervo sempre atualizado e acessível.
+                Crie listas personalizadas, organize jogos por interesse e
+                mantenha seu acervo sempre atualizado e acessível.
               </p>
             </div>
 
@@ -59,8 +70,8 @@ export default function Home() {
               </div>
               <h3>Selecione Rapidamente</h3>
               <p>
-                Filtros inteligentes e busca avançada para encontrar o jogo perfeito
-                para o seu mood do momento em segundos.
+                Filtros inteligentes e busca avançada para encontrar o jogo
+                perfeito para o seu mood do momento em segundos.
               </p>
             </div>
 
@@ -70,8 +81,8 @@ export default function Home() {
               </div>
               <h3>Visualize Tudo</h3>
               <p>
-                Veja capas, avaliações, gêneros e mais informações em um visual limpo
-                e intuitivo que facilita sua escolha.
+                Veja capas, avaliações, gêneros e mais informações em um visual
+                limpo e intuitivo que facilita sua escolha.
               </p>
             </div>
           </div>
@@ -82,24 +93,24 @@ export default function Home() {
             <div className="feature-block">
               <h3>Biblioteca Centralizada</h3>
               <p>
-                Todos os seus jogos em um único lugar. Sem mais procurar em vários apps
-                ou plataformas. Tudo organizado do seu jeito.
+                Todos os seus jogos em um único lugar. Sem mais procurar em
+                vários apps ou plataformas. Tudo organizado do seu jeito.
               </p>
             </div>
 
             <div className="feature-block">
               <h3>Filtros Inteligentes</h3>
               <p>
-                Busque por gênero, plataforma, avaliação ou qualquer critério que importa
-                para você. Encontre o jogo certo na hora certa.
+                Busque por gênero, plataforma, avaliação ou qualquer critério
+                que importa para você. Encontre o jogo certo na hora certa.
               </p>
             </div>
 
             <div className="feature-block">
               <h3>Favoritos e Listas</h3>
               <p>
-                Marque seus favoritos e crie listas temáticas. Nunca mais esqueça aquele
-                jogo que você queria experimentar.
+                Marque seus favoritos e crie listas temáticas. Nunca mais
+                esqueça aquele jogo que você queria experimentar.
               </p>
             </div>
 
@@ -116,10 +127,12 @@ export default function Home() {
         <section className="cta-section">
           <div className="cta-box">
             <h2>Pronto para organizar sua biblioteca?</h2>
-            <p>Comece agora e descubra uma nova forma de escolher seus jogos.</p>
-            <button 
+            <p>
+              Comece agora e descubra uma nova forma de escolher seus jogos.
+            </p>
+            <button
               className="primary-cta large"
-              onClick={() => (window.location.href = "/login")}
+              onClick={() => navigate("/login")}
             >
               Entrar em Joga+
               <ArrowRight size={20} />
