@@ -1,5 +1,22 @@
 ## Backend Setup
 
+## Prerequisites
+
+Before running the project, make sure you have the following installed on your machine:
+
+- **Git** – https://git-scm.com/downloads
+- **Node.js** (LTS version recommended) – https://nodejs.org/
+- **Docker Desktop** (includes Docker Compose) – https://www.docker.com/products/docker-desktop/
+
+You can verify the installation by running:
+
+```bash
+git --version
+node --version
+docker --version
+docker compose version
+```
+
 1. Clone the repository:
 
 ```bash
