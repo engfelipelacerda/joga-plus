@@ -5,6 +5,7 @@ import './mocks/connection.mock.js';
 import userRepository from './mocks/user.repository.mock.js';
 
 import loginService from '../src/services/login.service.js';
+import { signIn } from '../src/controller/loginController.js';
 
 describe('UT11 Deve chamar UserRepository.findUserByUsername com o username informado.', () => {
 	beforeEach(() => {
@@ -199,5 +200,35 @@ describe('UT14 Deve gerar JWT contendo o ID do usuário.', () => {
 		expect(jwt.sign).toHaveBeenCalledWith({ id: fakeUser.id }, 'test-secret', {
 			expiresIn: '1d',
 		});
+	});
+});
+
+describe('UT Controller - Login validation', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
+	it('Deve retornar 400 quando o body for inválido(ZodError)', async () => {
+		const req = {
+			body: {
+				username: 'Fulano',
+				//password faltando -> erro
+			},
+		};
+
+		const res = {
+			status: jest.fn().mockReturnThis(),
+			json: jest.fn(),
+		};
+
+		const next = jest.fn();
+
+		await signIn(req, res, next);
+
+		expect(next).toHaveBeenCalled();
+
+		const error = next.mock.calls[0][0];
+
+		expect(error.name).toBe('ZodError');
 	});
 });
