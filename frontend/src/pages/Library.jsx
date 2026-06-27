@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import {
   Search,
   Bell,
-  Heart,
   Plus,
   RefreshCw,
   X,
@@ -11,14 +10,17 @@ import {
   Loader,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import SidebarLayout from "../components/SidebarLayout";
 import api from "../services/api";
 
 // ─── Mapa de tipos de lista ───────────────────────────────────────────────────
 const TIPOS = {
   desejados: { label: "Desejados", emoji: "🎯" },
+  favoritos: { label: "Favoritos", emoji: "❤️" },
   nao_jogados: { label: "Não jogados", emoji: "📦" },
   jogados: { label: "Jogados", emoji: "✅" },
   jogar_novamente: { label: "Jogar novamente", emoji: "🔄" },
+  backlog: { label: "BackLog", emoji: "📌" },
 };
 
 // ─── Componente: barra de busca ───────────────────────────────────────────────
@@ -268,12 +270,22 @@ export default function Library() {
     setSearching(true);
     const timer = setTimeout(async () => {
       try {
-        // GET /games/search?titulo=... — rota pública, sem auth
-        const res = await fetch(
-          `http://localhost:3333/games/search?titulo=${encodeURIComponent(query)}`,
-        );
-        const data = await res.json();
-        setSearchResults(Array.isArray(data) ? data.slice(0, 8) : []);
+        const data = await api.get(`/games/search?titulo=${encodeURIComponent(query)}`);
+        const normalized = (Array.isArray(data) ? data : []).slice(0, 8).map((game) => ({
+          // gameID só deve ser usado quando veio da CheapShark.
+          // Resultado da RAWG usa rawg_id separado; se mandarmos "rawg-123" como
+          // cheapshark_id, o backend quebra ao salvar/favoritar/backlog.
+          id: game.id ?? game.gameID ?? game.rawg_id,
+          gameID: game.gameID ?? game.cheapshark_id ?? undefined,
+          rawg_id: game.rawg_id ?? undefined,
+          source: game.source ?? "cheapshark",
+          external: game.external ?? game.title ?? game.name ?? "Jogo",
+          genre: game.genre ?? game.genres ?? "Busca externa",
+          thumb:
+            game.thumb ?? game.cover ?? game.background_image ?? game.imagem_url ?? "",
+          cheapest: game.cheapest ?? game.price ?? game.promoPrice ?? 0,
+        }));
+        setSearchResults(normalized);
       } catch {
         setSearchResults([]);
       } finally {
@@ -286,17 +298,25 @@ export default function Library() {
   // ── Adicionar jogo à lista ──
   async function handleAdd(game, tipo_lista) {
     try {
-      // 1. Salva/atualiza o jogo no banco via cheapshark_id
-      const saved = await api.post("/games", { cheapshark_id: game.gameID });
-      const jogo_id = saved.game?.id;
+      const cheapshark_id = game.gameID ?? undefined;
+      const title = game.external ?? game.title ?? game.name;
+      const saved = await api.post("/games", { cheapshark_id, title });
+      const jogo_id = saved.game?.id || saved.id;
 
       if (!jogo_id) throw new Error("ID do jogo não retornado.");
 
-      // 2. Adiciona à lista do usuário
-      await api.post("/lists", { jogo_id, tipo_lista });
+      try {
+        await api.post("/lists", { jogo_id, tipo_lista });
+      } catch (error) {
+        if (error.status === 409) {
+          await api.patch("/lists/move", { jogo_id, tipo_lista });
+        } else {
+          throw error;
+        }
+      }
 
       showToast(
-        `"${game.external}" adicionado aos ${TIPOS[tipo_lista].label}!`,
+        `"${title}" adicionado aos ${TIPOS[tipo_lista].label}!`,
       );
       setQuery("");
       setSearchResults([]);
@@ -358,7 +378,8 @@ export default function Library() {
   const initial = user?.username?.[0]?.toUpperCase() ?? "?";
 
   return (
-    <div className="library-shell">
+    <SidebarLayout>
+      <div className="library-shell">
       {/* Toast */}
       {toast && (
         <div
@@ -421,7 +442,7 @@ export default function Library() {
           <div className="library-grid">
             {searchResults.map((game) => (
               <SearchResultCard
-                key={game.gameID}
+                key={game.id ?? game.gameID ?? game.external}
                 game={game}
                 onAdd={handleAdd}
               />
@@ -507,6 +528,7 @@ export default function Library() {
         )
       )}
     </div>
+    </SidebarLayout>
   );
 }
 

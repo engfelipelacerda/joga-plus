@@ -1,135 +1,78 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Search,
-  Bell,
-  Heart,
-  Home,
-  Star,
-  Tag,
-  Settings,
-  ChevronDown,
-  Play,
-  Sparkles,
-  LogOut,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, Bell, Heart, Plus, ChevronDown, Loader } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import SidebarLayout from "../components/SidebarLayout";
+import api from "../services/api";
 
-const mockGames = [
-  {
-    id: 1,
-    title: "Nebula Outlaws",
-    genre: "Ação | Ficção",
-    cover:
-      "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
-    progress: 72,
-    price: 59.99,
-    promoPrice: 29.99,
-    discount: 50,
-    favorite: false,
-  },
-  {
-    id: 2,
-    title: "Midnight Drift",
-    genre: "Corrida | Arcade",
-    cover:
-      "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=801&q=80",
-    progress: 38,
-    price: 49.99,
-    promoPrice: 24.99,
-    discount: 50,
-    favorite: true,
-  },
-  {
-    id: 3,
-    title: "Aeon Frontier",
-    genre: "RPG | Aventura",
-    cover:
-      "https://images.unsplash.com/photo-1526059959458-7130b91c7bf8?auto=format&fit=crop&w=800&q=80",
-    progress: 56,
-    price: 79.99,
-    promoPrice: 39.99,
-    discount: 51,
-    favorite: false,
-  },
-  {
-    id: 4,
-    title: "Shadow Protocol",
-    genre: "Stealth | Tiro",
-    cover:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
-    progress: 15,
-    price: 69.99,
-    promoPrice: 34.99,
-    discount: 50,
-    favorite: true,
-  },
-  {
-    id: 5,
-    title: "Solar Harvest",
-    genre: "Simulação | Estratégia",
-    cover:
-      "https://images.unsplash.com/photo-1522202222199-0c502491d60f?auto=format&fit=crop&w=800&q=80",
-    progress: 82,
-    price: 34.99,
-    promoPrice: 17.49,
-    discount: 50,
-    favorite: false,
-  },
-];
+const TIPOS = {
+  desejados: { label: "Desejados", emoji: "🎯" },
+  nao_jogados: { label: "Não jogados", emoji: "📦" },
+  jogados: { label: "Jogados", emoji: "✅" },
+  jogar_novamente: { label: "Jogar novamente", emoji: "🔄" },
+  backlog: { label: "BackLog", emoji: "📌" },
+};
 
-const SidebarButton = ({ icon, label, active, onClick }) => (
-  <button type="button" className={active ? "active" : ""} onClick={onClick}>
-    {icon}
-    {label}
-  </button>
-);
+const SearchResultCard = ({ game, onAdd, onFavorite }) => {
+  const [open, setOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
 
-const GameCard = ({ game, onToggleFavorite }) => (
-  <div className="game-card">
-    <div
-      className="card-cover"
-      style={{ backgroundImage: `url(${game.cover})` }}
-    />
-    <div className="card-body">
-      <div>
-        <h4>{game.title}</h4>
-        <div className="card-meta">{game.genre}</div>
-      </div>
-      <div className="card-actions">
-        <button className="play-button">
-          <Play size={16} /> Jogar
-        </button>
-        <button
-          className={`favorite-button ${game.favorite ? "favorited" : ""}`}
-          onClick={() => onToggleFavorite(game.id)}
-          type="button"
-        >
-          <Heart size={16} />
-          {game.favorite ? "Favorito" : "Favoritar"}
-        </button>
+  async function handleAdd(tipo_lista) {
+    setAdding(true);
+    setOpen(false);
+    await onAdd(game, tipo_lista);
+    setAdding(false);
+  }
+
+  return (
+    <div className="game-card search-result-card">
+      {game.cover && (
+        <div
+          className="card-cover"
+          style={{ backgroundImage: `url(${game.cover})` }}
+        />
+      )}
+      <div className="card-body">
+        <div>
+          <h4>{game.title}</h4>
+          <div className="card-meta">{game.genre}</div>
+        </div>
+        <div className="card-actions" style={{ position: "relative" }}>
+          <button
+            className="favorite-button"
+            type="button"
+            onClick={() => onFavorite(game)}
+            style={{ marginRight: 8 }}
+          >
+            <Heart size={14} /> Favoritar
+          </button>
+          <button
+            className="play-button"
+            type="button"
+            disabled={adding}
+            onClick={() => setOpen((prev) => !prev)}
+          >
+            {adding ? <Loader size={14} className="spin" /> : <Plus size={14} />}
+            {adding ? "Adicionando…" : "Adicionar"}
+            <ChevronDown size={14} />
+          </button>
+          {open && (
+            <div className="dropdown-menu">
+              {Object.entries(TIPOS).map(([tipo, { label, emoji }]) => (
+                <button
+                  key={tipo}
+                  type="button"
+                  onClick={() => handleAdd(tipo)}
+                >
+                  {emoji} {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
-
-const PromotionCard = ({ game }) => (
-  <div className="promotion-card">
-    <div
-      className="card-cover"
-      style={{ backgroundImage: `url(${game.cover})` }}
-    />
-    <div className="card-body promotion-content">
-      <h4>{game.title}</h4>
-      <div className="promotion-discount">-{game.discount}%</div>
-      <div className="price-group">
-        <span className="price-old">R$ {game.price.toFixed(2)}</span>
-        <span className="price-new">R$ {game.promoPrice.toFixed(2)}</span>
-      </div>
-      <button className="play-button">Ver Oferta</button>
-    </div>
-  </div>
-);
+  );
+};
 
 const HeroBanner = () => (
   <section className="hero-banner">
@@ -177,95 +120,119 @@ function getInitial(user) {
 }
 
 export default function Menu() {
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
-  const [games, setGames] = useState(mockGames);
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const [toast, setToast] = useState("");
 
-  const filteredGames = useMemo(() => {
-    return games.filter(
-      (game) =>
-        game.title.toLowerCase().includes(search.toLowerCase()) ||
-        game.genre.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [games, search]);
+  function showToast(message) {
+    setToast(message);
+    setTimeout(() => setToast(""), 3000);
+  }
 
-  const favorites = useMemo(
-    () => games.filter((game) => game.favorite),
-    [games],
-  );
+  useEffect(() => {
+    if (!search.trim()) {
+      setSearchResults([]);
+      setSearchError("");
+      return;
+    }
 
-  const continuePlaying = useMemo(
-    () => games.filter((game) => game.progress > 0).slice(0, 4),
-    [games],
-  );
+    const timer = setTimeout(async () => {
+      setSearching(true);
+      setSearchError("");
 
-  const promotions = useMemo(
-    () => games.filter((game) => game.discount > 0).slice(0, 3),
-    [games],
-  );
+      try {
+        const data = await api.get(`/games/search?titulo=${encodeURIComponent(search.trim())}`);
+        const normalized = (Array.isArray(data) ? data : []).slice(0, 8).map((game) => ({
+          id: game.gameID ?? game.id,
+          gameID: game.gameID,
+          rawg_id: game.rawg_id,
+          external: game.external ?? game.title ?? game.name ?? "Jogo",
+          title: game.title ?? game.external ?? game.name ?? "Jogo",
+          genre: game.genre ?? "Busca externa",
+          cover: game.thumb ?? game.cover ?? game.background_image ?? game.imagem_url ?? "",
+          progress: 0,
+          price: Number(game.cheapest) || Number(game.price) || 0,
+          promoPrice: Number(game.cheapest) || Number(game.promoPrice) || 0,
+          discount: Number(game.discount) || 0,
+          favorite: false,
+        }));
 
-  const handleToggleFavorite = (id) => {
-    setGames((current) =>
-      current.map((game) =>
-        game.id === id ? { ...game, favorite: !game.favorite } : game,
-      ),
-    );
-  };
+        setSearchResults(normalized);
+      } catch (error) {
+        setSearchResults([]);
+        setSearchError(error.message || "Não foi possível buscar jogos no momento.");
+      } finally {
+        setSearching(false);
+      }
+    }, 400);
 
-  function handleLogout() {
-    logout();
-    navigate("/login");
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  async function handleAdd(game, tipo_lista) {
+    try {
+      const cheapshark_id = game.gameID ?? undefined;
+      const title = game.external ?? game.title ?? game.name;
+      const saved = await api.post("/games", { cheapshark_id, title });
+      const jogo_id = saved.game?.id || saved.id;
+      if (!jogo_id) throw new Error("ID do jogo não retornado.");
+
+      try {
+        await api.post("/lists", { jogo_id, tipo_lista });
+      } catch (error) {
+        if (error.status === 409) {
+          await api.patch("/lists/move", { jogo_id, tipo_lista });
+        } else {
+          throw error;
+        }
+      }
+
+      showToast(`"${title}" adicionado aos ${TIPOS[tipo_lista].label}!`);
+      setSearch("");
+      setSearchResults([]);
+    } catch (err) {
+      showToast(
+        err.message === "Jogo já está na sua lista."
+          ? "Este jogo já está na sua lista."
+          : `Erro: ${err.message}`,
+      );
+    }
+  }
+
+  async function handleFavorite(game) {
+    try {
+      const cheapshark_id = game.gameID ?? undefined;
+      const title = game.external ?? game.title ?? game.name;
+      const saved = await api.post("/games", { cheapshark_id, title });
+      const jogo_id = saved.game?.id || saved.id;
+      if (!jogo_id) throw new Error("ID do jogo não retornado.");
+
+      try {
+        await api.post("/lists", { jogo_id, tipo_lista: "favoritos" });
+      } catch (error) {
+        if (error.status === 409) {
+          await api.patch("/lists/move", { jogo_id, tipo_lista: "favoritos" });
+        } else {
+          throw error;
+        }
+      }
+
+      showToast(`"${title}" adicionado aos Favoritos!`);
+    } catch (err) {
+      showToast(
+        err.message === "Jogo já está na sua lista."
+          ? "Este jogo já está na sua lista."
+          : `Erro: ${err.message}`,
+      );
+    }
   }
 
   return (
-    <div className="menu-shell">
-      <aside className="menu-sidebar">
-        <div className="sidebar-brand">
-          <h2>
-            Joga<span>+</span>
-          </h2>
-          <ChevronDown size={20} />
-        </div>
-
-        <nav className="sidebar-nav">
-          <SidebarButton icon={<Home size={18} />} label="Início" active />
-          <SidebarButton
-            icon={<Tag size={18} />}
-            label="Biblioteca"
-            onClick={() => navigate("/library")}
-          />
-          <SidebarButton icon={<Heart size={18} />} label="Favoritos" />
-          <SidebarButton icon={<Sparkles size={18} />} label="Promoções" />
-          <SidebarButton icon={<Star size={18} />} label="Perfil" />
-          <SidebarButton icon={<Settings size={18} />} label="Configurações" />
-        </nav>
-
-        {/* Rodapé do sidebar: nome real + botão de logout */}
-        <div className="sidebar-footer">
-          {user ? (
-            <>
-              <span>
-                Olá, <strong>{user.username}</strong>!
-              </span>
-              <button
-                type="button"
-                className="logout-button"
-                onClick={handleLogout}
-                title="Sair"
-              >
-                <LogOut size={16} />
-                Sair
-              </button>
-            </>
-          ) : (
-            <span>Carregando...</span>
-          )}
-        </div>
-      </aside>
-
-      <main className="menu-content">
+    <SidebarLayout>
         <header className="menu-header">
           <div className="app-title">
             <h1>
@@ -289,89 +256,49 @@ export default function Menu() {
           </div>
         </header>
 
-        <HeroBanner />
+        {searching && <p className="empty-state">Buscando jogos…</p>}
+        {searchError && <p className="empty-state">{searchError}</p>}
+        {toast && <p className="toast-message">{toast}</p>}
+
+        {!search.trim() && <HeroBanner />}
 
         <section className="section-row">
           <div className="section-heading">
-            <h3>Continue Jogando</h3>
-            <button type="button">Ver todos</button>
+            <h3>Resultados de busca</h3>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setSearchResults([]);
+              }}
+            >
+              Limpar
+            </button>
           </div>
-          <div className="continue-row">
-            {continuePlaying.map((game) => (
-              <div key={game.id} className="game-card">
-                <div
-                  className="card-cover"
-                  style={{ backgroundImage: `url(${game.cover})` }}
-                />
-                <div className="card-body">
-                  <h4>{game.title}</h4>
-                  <div className="card-meta">{game.genre}</div>
-                  <div className="progress-track">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${game.progress}%` }}
-                    />
-                  </div>
-                  <div className="card-actions">
-                    <button className="play-button">Continuar</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section-row">
-          <div className="section-heading">
-            <h3>Biblioteca</h3>
-            <button type="button">Filtrar</button>
-          </div>
-          <div className="library-grid">
-            {filteredGames.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className="section-row">
-          <div className="section-heading">
-            <h3>Promoções</h3>
-            <button type="button">Ver ofertas</button>
-          </div>
-          <div className="promotions-grid">
-            {promotions.map((game) => (
-              <PromotionCard key={game.id} game={game} />
-            ))}
-          </div>
-        </section>
-
-        <section className="section-row">
-          <div className="section-heading">
-            <h3>Jogos Favoritos</h3>
-            <button type="button">Ver favoritos</button>
-          </div>
-          <div className="favorites-grid">
-            {favorites.length > 0 ? (
-              favorites.map((game) => (
-                <GameCard
+          {searchResults.length > 0 ? (
+            <div className="library-grid">
+              {searchResults.map((game) => (
+                <SearchResultCard
                   key={game.id}
                   game={game}
-                  onToggleFavorite={handleToggleFavorite}
+                  onAdd={handleAdd}
+                  onFavorite={handleFavorite}
                 />
-              ))
+              ))}
+            </div>
+          ) : (
+            search.trim() ? (
+              <div className="empty-state">
+                Nenhum jogo encontrado. Tente outro termo.
+              </div>
             ) : (
               <div className="empty-state">
-                Nenhum favorito ainda. Clique no coração para marcar seus jogos
-                preferidos.
+                Use a busca para encontrar jogos reais e adicioná-los às suas
+                listas.
               </div>
-            )}
-          </div>
+            )
+          )}
         </section>
-      </main>
-    </div>
+    </SidebarLayout>
   );
 }

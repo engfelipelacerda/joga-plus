@@ -28,7 +28,7 @@ export default function Login() {
       const data = await api.post("/auth/login", { username, password });
 
       if (data.token) {
-        login(data.token); // salva token + carrega usuário no contexto
+        await login(data.token); // salva token + carrega usuário no contexto
       }
 
       navigate("/menu");

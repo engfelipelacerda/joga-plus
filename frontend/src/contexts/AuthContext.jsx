@@ -36,10 +36,11 @@ export function AuthProvider({ children }) {
     fetchMe();
   }, [fetchMe]);
 
-  function login(token) {
+  async function login(token) {
     localStorage.setItem("token", token);
-    // após salvar o token, busca os dados do usuário
-    fetchMe();
+    setLoading(true);
+    // após salvar o token, busca os dados do usuário antes de navegar
+    await fetchMe();
   }
 
   function logout() {

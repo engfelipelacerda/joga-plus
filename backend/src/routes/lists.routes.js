@@ -10,6 +10,7 @@ router.get('/:tipo', authMiddleware, listController.listByType);
 router.post('/', authMiddleware, listController.add);
 router.patch('/move', authMiddleware, listController.moveToList);
 router.patch('/priority', authMiddleware, listController.updatePriority);
+router.patch('/status', authMiddleware, listController.updateStatus);
 router.delete('/:jogo_id', authMiddleware, listController.remove);
 
 export default router;

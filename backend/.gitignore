@@ -1,5 +1,7 @@
 node_modules
 # Keep environment variables out of version control
 .env
+# Local docker-compose overrides (team-specific ports)
+docker-compose.override.yml
 
 /src/generated/prisma

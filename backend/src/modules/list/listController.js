@@ -1,7 +1,7 @@
 import listModel from './listModel.js';
 import gameModel from '../games/gameModel.js';
 
-const VALID_TYPES = ['desejados', 'nao_jogados', 'jogados', 'jogar_novamente'];
+const VALID_TYPES = ['desejados', 'nao_jogados', 'jogados', 'jogar_novamente', 'backlog', 'favoritos'];
 
 // Adiciona jogo à lista do usuário
 const add = async (req, res) => {
@@ -103,6 +103,37 @@ const moveToList = async (req, res) => {
 	}
 };
 
+// Atualiza status do jogo no backlog
+const updateStatus = async (req, res) => {
+	const usuario_id = req.user.id;
+	const { jogo_id, status } = req.body;
+	const VALID_STATUS = ['quer_jogar', 'joguei', 'talvez'];
+
+	if (!jogo_id || !status) {
+		return res.status(400).json({ message: 'Informe jogo_id e status.' });
+	}
+
+	if (!VALID_STATUS.includes(status)) {
+		return res.status(400).json({
+			message: `status deve ser um dos: ${VALID_STATUS.join(', ')}.`,
+		});
+	}
+
+	try {
+		const existing = await listModel.findByUserAndGame(usuario_id, jogo_id);
+		if (!existing)
+			return res
+				.status(404)
+				.json({ message: 'Jogo não encontrado na sua lista.' });
+
+		await listModel.updateStatus(usuario_id, jogo_id, status);
+		return res.status(200).json({ message: 'Status atualizado com sucesso.' });
+	} catch (error) {
+		console.error('Erro ao atualizar status:', error);
+		return res.status(500).json({ message: 'Erro ao atualizar status.' });
+	}
+};
+
 // Atualiza prioridade de um jogo
 const updatePriority = async (req, res) => {
 	const usuario_id = req.user.id;
@@ -155,5 +186,5 @@ const remove = async (req, res) => {
 	}
 };
 
-export default { add, listAll, listByType, moveToList, updatePriority, remove };
+export default { add, listAll, listByType, moveToList, updateStatus, updatePriority, remove };
 

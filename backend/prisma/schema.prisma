@@ -42,6 +42,8 @@ enum TipoLista {
   nao_jogados
   jogados
   jogar_novamente
+  backlog
+  favoritos
 }
 
 model lists {
@@ -49,13 +51,20 @@ model lists {
   usuario_id Int
   jogo_id    Int
   tipo_lista TipoLista
-  prioridade Int       @default(1)
-  added_at   DateTime? @default(now()) @db.Timestamp(0)
+  prioridade Int             @default(1)
+  status     BacklogStatus  @default(quer_jogar)
+  added_at   DateTime?      @default(now()) @db.Timestamp(0)
 
   usuario users @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
   jogo    games @relation(fields: [jogo_id], references: [id], onDelete: Cascade)
 
   @@unique([usuario_id, jogo_id])
+}
+
+enum BacklogStatus {
+  quer_jogar
+  joguei
+  talvez
 }
 
 model assessments {
