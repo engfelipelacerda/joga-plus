@@ -1,3 +1,4 @@
+import z from 'zod';
 import bcrypt from './mocks/bcrypt.mock.js';
 import jwt from './mocks/jwt.mock.js';
 
@@ -6,6 +7,7 @@ import userRepository from './mocks/user.repository.mock.js';
 
 import loginService from '../src/services/login.service.js';
 import { signIn } from '../src/controller/loginController.js';
+import errorHandler from '../src/middlewares/errorHandler.js';
 
 describe('UT11 Deve chamar UserRepository.findUserByUsername com o username informado.', () => {
 	beforeEach(() => {
@@ -203,7 +205,7 @@ describe('UT14 Deve gerar JWT contendo o ID do usuário.', () => {
 	});
 });
 
-describe('UT Controller - Login validation', () => {
+describe('UT15 Controller - Login validation', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
@@ -230,5 +232,38 @@ describe('UT Controller - Login validation', () => {
 		const error = next.mock.calls[0][0];
 
 		expect(error.name).toBe('ZodError');
+	});
+});
+
+describe('Error Handler', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+	it('Deve retornar 400 para ZodError', () => {
+		let error;
+
+		try {
+			z.object({
+				password: z.string(),
+			}).parse({});
+		} catch (err) {
+			error = err;
+		}
+		console.log(error);
+
+		const req = {};
+		const res = {
+			status: jest.fn().mockReturnThis(),
+			json: jest.fn(),
+		};
+		const next = jest.fn();
+
+		errorHandler(error, req, res, next);
+
+		expect(res.status).toHaveBeenCalledWith(400);
+		expect(res.json).toHaveBeenCalledWith({
+			code: 'VALIDATION_ERROR',
+			errors: error.flatten().fieldErrors,
+		});
 	});
 });

@@ -17,6 +17,7 @@ Módulo: Login
 - UT13 Deve chamar bcrypt.compare com a senha informada e o hash armazenado.
 - UT14 Deve gerar JWT contendo o ID do usuário.
 - UT15 Controller - Login validation
+- UT16 errorHandler - deve retornar 400 para ZodError
 ```
 
 ---
