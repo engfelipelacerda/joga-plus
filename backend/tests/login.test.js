@@ -94,3 +94,25 @@ describe('UT03 Rejeitar senha incorreta.', () => {
 		);
 	});
 });
+
+describe('UT04 Gerar JWT.', () => {
+	it('deve garantir a geração do JWT', async () => {
+		const credentials = {
+			username: 'Fulano',
+			password: 'changeme',
+		};
+
+		const fakeUser = {
+			id: 1,
+			username: 'Fulano',
+			password: 'hashed',
+		};
+
+		userRepository.findUserByUsername.mockResolvedValue(fakeUser);
+		bcrypt.compare.mockResolvedValue(true);
+		jwt.sign.mockReturnValue('fake-token');
+
+		const result = await loginService.create(credentials);
+		expect(result).toBe('fake-token');
+	});
+});
