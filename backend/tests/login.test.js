@@ -70,3 +70,27 @@ describe('UT02 Rejeitar usuário inexistente.', () => {
 		);
 	});
 });
+
+describe('UT03 Rejeitar senha incorreta.', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+	it('deve lançar um erro quando a comparação com senha do banco não bater', async () => {
+		const credentials = {
+			username: 'Fulano',
+			password: 'qwerty',
+		};
+
+		const fakeUser = {
+			id: 1,
+			username: 'Fulano',
+			password: 'hashed',
+		};
+		userRepository.findUserByUsername.mockResolvedValue(fakeUser);
+		bcrypt.compare.mockResolvedValue(false);
+
+		await expect(loginService.create(credentials)).rejects.toThrow(
+			'Senha inválida',
+		);
+	});
+});
