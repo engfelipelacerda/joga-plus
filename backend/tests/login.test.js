@@ -137,3 +137,35 @@ describe('UT12 Deve retornar erro quando o repositório lançar uma exceção.',
 		await expect(loginService.create(credentials)).rejects.toThrow(dbError);
 	});
 });
+
+describe('UT13 Deve chamar bcrypt.compare com a senha informada e o hash armazenado.', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+	it('Assegurar que os argumentos da função compare', async () => {
+		const credentials = {
+			username: 'Fulano',
+			password: 'changeme',
+		};
+
+		const fakeUser = {
+			id: 1,
+			username: 'Fulano',
+			password: 'hashed',
+		};
+
+		userRepository.findUserByUsername.mockResolvedValue(fakeUser);
+		bcrypt.compare.mockResolvedValue(true);
+
+		jwt.sign.mockReturnValue('fake-token');
+
+		await loginService.create(credentials);
+
+		expect(bcrypt.compare).toHaveBeenCalledTimes(1);
+
+		expect(bcrypt.compare).toHaveBeenCalledWith(
+			credentials.password,
+			fakeUser.password,
+		);
+	});
+});
