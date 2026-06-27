@@ -142,7 +142,7 @@ describe('UT13 Deve chamar bcrypt.compare com a senha informada e o hash armazen
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
-	it('Assegurar que os argumentos da função compare', async () => {
+	it('Assegurar os argumentos da função compare', async () => {
 		const credentials = {
 			username: 'Fulano',
 			password: 'changeme',
@@ -167,5 +167,37 @@ describe('UT13 Deve chamar bcrypt.compare com a senha informada e o hash armazen
 			credentials.password,
 			fakeUser.password,
 		);
+	});
+});
+
+describe('UT14 Deve gerar JWT contendo o ID do usuário.', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+	it('Assegurar os argumentos da função sign', async () => {
+		const credentials = {
+			username: 'Fulano',
+			password: 'changeme',
+		};
+
+		const fakeUser = {
+			id: 1,
+			username: 'Fulano',
+			password: 'hashed',
+		};
+
+		process.env.JWT_SECRET = 'test-secret';
+
+		userRepository.findUserByUsername.mockResolvedValue(fakeUser);
+		bcrypt.compare.mockResolvedValue(true);
+
+		jwt.sign.mockReturnValue('fake-token');
+
+		await loginService.create(credentials);
+
+		expect(jwt.sign).toHaveBeenCalledTimes(1);
+		expect(jwt.sign).toHaveBeenCalledWith({ id: fakeUser.id }, 'test-secret', {
+			expiresIn: '1d',
+		});
 	});
 });
