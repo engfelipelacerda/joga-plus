@@ -1,4 +1,4 @@
-## Backend Setup
+# Joga+ — Frontend
 
 ## Prerequisites
 
