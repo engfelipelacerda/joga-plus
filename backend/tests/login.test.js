@@ -52,3 +52,21 @@ describe('UT01 Autenticar usuário com credenciais válidas.', () => {
 		expect(result).toEqual('fake-token');
 	});
 });
+
+describe('UT02 Rejeitar usuário inexistente.', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+	it('deve lançar um erro quando o username não estiver cadastrado', async () => {
+		const credentials = {
+			username: 'Fulano',
+			password: 'changeme',
+		};
+
+		userRepository.findUserByUsername.mockResolvedValue(null);
+
+		await expect(loginService.create(credentials)).rejects.toThrow(
+			'Username não registrado',
+		);
+	});
+});
