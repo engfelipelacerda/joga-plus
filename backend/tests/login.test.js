@@ -96,6 +96,9 @@ describe('UT03 Rejeitar senha incorreta.', () => {
 });
 
 describe('UT04 Gerar JWT.', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
 	it('deve garantir a geração do JWT', async () => {
 		const credentials = {
 			username: 'Fulano',
@@ -114,5 +117,23 @@ describe('UT04 Gerar JWT.', () => {
 
 		const result = await loginService.create(credentials);
 		expect(result).toBe('fake-token');
+	});
+});
+
+describe('UT12 Deve retornar erro quando o repositório lançar uma exceção.', () => {
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+	it('Retorna um erro genérico quando o repository levantar exceção', async () => {
+		const credentials = {
+			username: 'Fulano',
+			password: 'changeme',
+		};
+
+		const dbError = new Error('Falha no banco');
+
+		userRepository.findUserByUsername.mockRejectedValue(dbError);
+
+		await expect(loginService.create(credentials)).rejects.toThrow(dbError);
 	});
 });
