@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import appError from '../domain/appError.js';
-import { userRepository } from '../repository/user.repository.js';
+import userRepository from '../repository/user.repository.js';
 
 class loginService {
 	async create(body) {
